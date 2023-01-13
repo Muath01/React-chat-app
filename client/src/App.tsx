@@ -7,10 +7,19 @@ function App() {
 
   const [message, setMessage] = useState("")
   const [messageRecieved, setMessageRecieved] = useState("");
+  const [room, setRoom] = useState("");
 
   function sendMessage(){
-    socket.emit("send_message", {message:message})
+    socket.emit("send_message", {message, room})
+    setRoom(room)
 
+  }
+
+  function chooseRoom(){
+    if(room != ""){
+      socket.emit("join_room", room)
+
+    }
   }
 
   useEffect(() => {
@@ -21,9 +30,18 @@ function App() {
  
   return (
     <div>
-      <input value={message} onChange={e => setMessage(e.target.value)}  placeholder='message'/>
+      {/* <h1 className='text-3xl font-bold underline'>My App</h1> */}
+
+      <div>
+        <h1 className="text-blue-500" >Hello</h1>
+      </div>
+
+
+      {/* <input value={message} onChange={e => setMessage(e.target.value)}  placeholder='message'/>
       <button onClick={sendMessage}>Send message</button>
-      <h2>{messageRecieved}</h2>
+      <input value={room} onChange={e => setRoom(e.target.value)}  placeholder='room'/>
+      <button onClick={chooseRoom}>Join Room</button>
+      <h2>Message: {messageRecieved}</h2> */}
     </div>
   );
 }

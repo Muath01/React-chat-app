@@ -16,15 +16,22 @@ const io = new Server(server, {
     }
 })
 
+let currentRoom = "";
 
 io.on("connection", (socket) => {
     console.log("User connected: ", socket.id)
 
+    socket.on("join_room", (data) => {
+        socket.leave(currentRoom)
+        currentRoom = data
+        socket.join(currentRoom)
+        // console.log("here")
+    })
     
     socket.on("send_message", data => {
-        console.log(data.message)
-        socket.broadcast.emit("recieve_message", data)
+        socket.to(data.room).emit("recieve_message", data)
     })
+
 })
 
 server.listen(3001, () => {

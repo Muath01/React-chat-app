@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import "./App.css"
 import * as io from "socket.io-client";
+import SideBar from './Components/SideBar';
+import Messages from './Components/Messages';
 const socket = io.connect("http://localhost:3001");
 
 function App() {
@@ -29,21 +31,26 @@ function App() {
   }, [socket])
  
   return (
-    <div>
-      {/* <h1 className='text-3xl font-bold underline'>My App</h1> */}
+    <div className='body overflow-hidden '>
 
-      <div>
-        <h1 className="text-blue-500" >Hello</h1>
-      </div>
+        <SideBar/>
+
+        <Messages />
 
 
-      {/* <input value={message} onChange={e => setMessage(e.target.value)}  placeholder='message'/>
-      <button onClick={sendMessage}>Send message</button>
-      <input value={room} onChange={e => setRoom(e.target.value)}  placeholder='room'/>
-      <button onClick={chooseRoom}>Join Room</button>
-      <h2>Message: {messageRecieved}</h2> */}
+
     </div>
   );
 }
 
+// {/* <h1 className='text-3xl font-bold underline'>My App</h1> */}
+
+
+
+
+// {/* <input value={message} onChange={e => setMessage(e.target.value)}  placeholder='message'/>
+// <button onClick={sendMessage}>Send message</button>
+// <input value={room} onChange={e => setRoom(e.target.value)}  placeholder='room'/>
+// <button onClick={chooseRoom}>Join Room</button>
+// <h2>Message: {messageRecieved}</h2> */}
 export default App;

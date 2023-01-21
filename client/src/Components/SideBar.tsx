@@ -29,7 +29,7 @@ function SideBar() {
   ];
 
   return (
-    <div className="list-none shadow-lg text-4xl w-1/4 h-full my-1 muath">
+    <div className="list-none shadow-lg text-4xl w-full h-full my-1 muath">
       <h2 className="wotfard relative top-3 left-1">SideBar</h2>
 
       <ul className="text-xl my-10 flex flex-col">

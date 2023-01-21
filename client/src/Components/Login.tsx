@@ -26,12 +26,12 @@ function Login({
       if (data == "fail") {
         setLoginSucceful(false);
       } else {
-        console.log("here");
+        // console.log("here");
         localStorage.setItem("logged", userName);
         setLoginSucceful(true);
       }
 
-      console.log(data);
+      // console.log(data);
     } catch (err: any) {
       console.log(err.message);
     }

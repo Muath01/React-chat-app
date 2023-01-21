@@ -17,14 +17,12 @@ function SignUp({ signUp, setSignUp }: SignUpProps) {
   const [rePassword, setRePassword] = useState("");
   const [user, setUpUser] = useState<User>();
 
-  console.log("ma-user", user);
-
   useEffect(() => {}, []);
 
   async function createAccount(e: any) {
     e.preventDefault();
+
     if (password != rePassword) {
-      console.log("Pass Word does not match");
       return;
     }
     setUpUser({
@@ -40,6 +38,12 @@ function SignUp({ signUp, setSignUp }: SignUpProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+      //   location.reload();
+      //   location.href = location.href;
+      window.location.assign("/");
+      setSignUp(false);
+
+      //   window.location = "/";
     } catch (error: any) {
       console.log(error.message);
     }

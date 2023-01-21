@@ -18,7 +18,8 @@ type chat_id = {
 
 type Message = {
   message: string;
-  sent: boolean;
+  sent?: boolean;
+  sender?: string | null;
 };
 
 function Messages({ socket }: { socket: any }) {
@@ -32,25 +33,12 @@ function Messages({ socket }: { socket: any }) {
   const [recievedMessages, setRecievedMessages] = useState<string[]>([]);
   const [allMessages, setAllMessages] = useState<Message[]>([]);
 
+  const logged = localStorage.getItem("logged");
+
   const [message, setMessage] = useState("");
   // selector
   const { chat_id, sender_id, reciever_id, chat, timestamp, status } =
     useSelector((state: any) => state.message);
-
-  console.log(
-    "chat_id: ",
-    chat_id,
-    "sender_id: ",
-    sender_id,
-    "reciever_id: ",
-    reciever_id,
-    "chat: ",
-    chat,
-    "timestamp: ",
-    timestamp,
-    "status: ",
-    status
-  );
 
   //
   function sendMessage(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -58,8 +46,28 @@ function Messages({ socket }: { socket: any }) {
       setSentMessages([...sentMessages, message]);
       // console.log("sent", sentMessages);
       socket.emit("send_message", { message });
-      setAllMessages([...allMessages, { message: message, sent: true }]);
+      setAllMessages([...allMessages, { message: message, sender: logged }]);
       setMessage("");
+    }
+  }
+
+  // send the message to the database
+
+  function saveMessage(e: React.KeyboardEvent<HTMLInputElement>) {
+    try {
+      setAllMessages([...allMessages, { message: message, sender: logged }]);
+      console.log(allMessages);
+      const body = {
+        messages: [...allMessages, { message: message, sender: logged }],
+        logged: logged,
+      };
+      const resutl = fetch("http://localhost:3001/chat", {
+        method: "PUT",
+        headers: { "Content-Type": "Application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch (error: any) {
+      console.log(error.message);
     }
   }
 
@@ -67,7 +75,7 @@ function Messages({ socket }: { socket: any }) {
     socket.on("recieve_message", (data: any) => {
       // recievedMessages.push(data.message)
       // setRecievedMessages([...recievedMessages, data.message])
-      setAllMessages([...allMessages, { message: data.message, sent: false }]);
+      setAllMessages([...allMessages, { message: data.message, sender: "" }]);
 
       // console.log(data.message)
       setRecieveMessage(data.message);
@@ -122,6 +130,7 @@ function Messages({ socket }: { socket: any }) {
                         </div>
                       )
                     )}
+                    {/* end of map */}
                   </div>
                 </div>
               </div>
@@ -135,7 +144,12 @@ function Messages({ socket }: { socket: any }) {
             </div>
             <input
               onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => sendMessage(e)}
+              onKeyDown={(e) => {
+                if (e.key == "Enter") {
+                  saveMessage(e);
+                }
+                sendMessage(e);
+              }}
               value={message}
               type="text"
               className="block w-full rounded-md border-gray-500 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10 bg-gray-100"

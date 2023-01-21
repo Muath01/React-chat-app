@@ -162,6 +162,17 @@ app.get("/chats", async (req, res) => {
     console.log(error.message);
   }
 });
+
+// Put requests
+
+// gets the individual chats
+app.put("/chat", async (req, res) => {
+  try {
+    console.log("here", req.body);
+  } catch (error) {
+    console.log(error.message);
+  }
+});
 io.on("connection", (socket) => {
   console.log("User connected: ", socket.id);
 

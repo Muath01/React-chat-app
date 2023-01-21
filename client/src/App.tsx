@@ -32,7 +32,7 @@ function App() {
   // }, [socket]);
 
   useEffect(() => {
-    localStorage.setItem("logged", "hello");
+    localStorage.setItem("logged", JSON.stringify("hello"));
     console.log("hello there buddy");
   }, []);
   console.log(loginSucceful);

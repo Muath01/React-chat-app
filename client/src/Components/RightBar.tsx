@@ -4,7 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaLaugh, FaUserFriends } from "react-icons/fa";
 import { MdGroups } from "react-icons/md";
 import { TbSocial } from "react-icons/tb";
-import { setMessage } from "../Redux/message";
+import { setMessage, setReceiver } from "../Redux/message";
+import Messages from "./Messages";
+import { RootState } from "../Redux/store";
 
 type User = [
   {
@@ -14,29 +16,57 @@ type User = [
   }
 ];
 
-function RightBar() {
+type RightBarProps = {
+  socket: any;
+};
+
+function RightBar({ socket }: RightBarProps) {
   const [users, setUsers] = useState<User>();
   const [clickedUser, setClickUser] = useState("");
 
   // selectors
 
   const { username } = useSelector((state: any) => state.message);
-  const [currentUsername, setCurrentUsername] = useState(username);
+  const { logged, receiver } = useSelector(
+    (state: RootState) => state.loggedAndReceiver
+  );
 
-  useEffect(() => {
-    setCurrentUsername(username);
-  }, [username]);
+  // useEffect(() => {}, [receiver]);
 
   const dispatch = useDispatch();
 
+  // load users on the right side of the screen
+
   async function getUsers() {
     try {
-      const url =
-        "http://localhost:3001/users?logged=" + localStorage.getItem("logged");
+      const url = "http://localhost:3001/users?logged=" + logged;
       const response = await fetch(url);
       const jsonResponse = await response.json();
 
       setUsers(jsonResponse);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
+
+  // get the messages on the database, between the logged in user, and the clicked reciever.
+
+  async function getMessage(e: React.MouseEvent<HTMLElement, MouseEvent>) {
+    e.preventDefault();
+    const target = e.target as HTMLElement;
+
+    await dispatch(setReceiver(target.innerText));
+
+    try {
+      const url =
+        "http://localhost:3001/loadChat?logged=" +
+        logged +
+        "&reciever=" +
+        target.innerText;
+      const response = await fetch(url);
+
+      const jsonData = await response.json();
+      dispatch(setMessage(jsonData));
     } catch (error: any) {
       console.log(error.message);
     }
@@ -49,10 +79,12 @@ function RightBar() {
     try {
       const response = await fetch("http://localhost:3001/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          sender: localStorage.getItem("logged"),
-          reciever: target.innerText,
+          sender: logged,
+          reciever: receiver,
         }),
       });
     } catch (error: any) {
@@ -62,23 +94,13 @@ function RightBar() {
 
   async function fetchMessage(e: React.MouseEvent<HTMLElement, MouseEvent>) {
     const target = e.target as HTMLElement;
-    // const usernam
-
-    // console.log(target.innerText);
-    // console.log("message => ", chat);
-    // console.log("current-message => ", currentMessage);
-
-    dispatch(setMessage(target.innerText));
 
     e.preventDefault();
 
     try {
-      const url = `http://localhost:3001/chats?user_name=` + target.innerText;
+      const url = `http://localhost:3001/chats?user_name=` + receiver;
       const response = await fetch(url);
-      console.log(response);
       const jsonResponse = await response.json();
-
-      console.log("JSON", jsonResponse);
     } catch (error: any) {
       console.log(error.message);
     }
@@ -97,6 +119,7 @@ function RightBar() {
   return (
     <div className="list-none shadow-lg text-4xl h-full my-1 muath w-full">
       <h2 className="wotfard relative top-3 left-1">Users</h2>
+      {/* <Messages socket={socket} /> */}
 
       <ul className="text-xl my-10 flex flex-col ">
         {users != undefined &&
@@ -104,6 +127,9 @@ function RightBar() {
           users.map((item, index) => (
             <li
               onClick={(e) => {
+                const target = e.target as HTMLElement;
+
+                getMessage(e);
                 createChat(e);
                 fetchMessage(e);
               }}

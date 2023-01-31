@@ -6,6 +6,7 @@ import Messages from "./Components/Messages";
 import RightBar from "./Components/RightBar";
 import Login from "./Components/Login";
 import { useSelector } from "react-redux";
+
 const socket = io.connect("http://localhost:3001");
 
 function App() {
@@ -33,11 +34,11 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem("logged", JSON.stringify("hello"));
-    console.log("hello there buddy");
+    // console.log("hello there buddy");
   }, []);
-  console.log(loginSucceful);
+  // console.log(loginSucceful);
   if (!loginSucceful) {
-    console.log("heresfdsdf");
+    // console.log("heresfdsdf");
     localStorage.clear();
     // localStorage.setItem("user", "hello");
   }
@@ -59,7 +60,7 @@ function App() {
           </div>
 
           <div className="col-span-3">
-            <RightBar />
+            <RightBar socket={socket} />
           </div>
         </div>
       )}

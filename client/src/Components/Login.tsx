@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SignUp from "./SignUp";
+import { useDispatch } from "react-redux";
+import { setLoggedUser } from "../Redux/message";
 
 function Login({
   setLoginSucceful,
@@ -11,6 +13,8 @@ function Login({
   const [password, setPassword] = useState("");
 
   const [signUp, setSignUp] = useState(false);
+
+  const dispatch = useDispatch();
 
   async function checkLogin(e: any) {
     e.preventDefault();
@@ -27,6 +31,7 @@ function Login({
         setLoginSucceful(false);
       } else {
         // console.log("here");
+        dispatch(setLoggedUser(userName));
         localStorage.setItem("logged", userName);
         setLoginSucceful(true);
       }

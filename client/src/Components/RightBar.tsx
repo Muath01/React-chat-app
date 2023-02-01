@@ -49,7 +49,7 @@ function RightBar({ socket }: RightBarProps) {
     }
   }
 
-  // get the messages on the database, between the logged in user, and the clicked reciever.
+  // get the messages on the database, between the logged in user, and the clicked receiver.
 
   async function getMessage(e: React.MouseEvent<HTMLElement, MouseEvent>) {
     e.preventDefault();
@@ -58,10 +58,11 @@ function RightBar({ socket }: RightBarProps) {
     await dispatch(setReceiver(target.innerText));
 
     try {
+      console.log("here", target.innerText);
       const url =
         "http://localhost:3001/loadChat?logged=" +
         logged +
-        "&reciever=" +
+        "&receiver=" +
         target.innerText;
       const response = await fetch(url);
 
@@ -84,7 +85,7 @@ function RightBar({ socket }: RightBarProps) {
         },
         body: JSON.stringify({
           sender: logged,
-          reciever: receiver,
+          receiver: target.innerText,
         }),
       });
     } catch (error: any) {

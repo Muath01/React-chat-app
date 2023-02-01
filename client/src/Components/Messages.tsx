@@ -2,11 +2,12 @@ import { Socket } from "dgram";
 import React, { useEffect, useState } from "react";
 import { AiOutlineMessage } from "react-icons/ai";
 import { BsCheckLg } from "react-icons/bs";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as io from "socket.io-client";
+import { setMessage, setReceiver, setMessageOnly } from "../Redux/message";
 import { RootState } from "../Redux/store";
 
-const socket = io.connect("http://localhost:3001");
+// const socket = io.connect("http://localhost:3001");
 
 type MessageProps = {
   socket?: any;
@@ -15,7 +16,7 @@ type MessageProps = {
 type chat_id = {
   chat_id?: number;
   sender_id?: number;
-  reciever_id?: number;
+  receiver_id?: number;
   chat?: string;
   timestamp?: string;
   status: "sent";
@@ -25,7 +26,7 @@ type Message = {
   "message": string;
   "sent"?: boolean;
   "sender"?: string | null;
-  "reciever"?: string | null;
+  "receiver"?: string | null;
 };
 
 function Messages({ socket }: MessageProps) {
@@ -34,6 +35,8 @@ function Messages({ socket }: MessageProps) {
   // an array to display for sent and recieved messages
 
   const [com, setCom] = useState<chat_id>();
+
+  const dispatch = useDispatch();
 
   const [sentMessages, setSentMessages] = useState<string[]>([]);
   const [recievedMessages, setRecievedMessages] = useState<string[]>([]);
@@ -47,47 +50,41 @@ function Messages({ socket }: MessageProps) {
   );
   const [message, setMessage] = useState("");
   // selector
-  const { chat_id, sender_id, reciever_id, messages, timestamp, status } =
+  const { chat_id, sender_id, receiver_id, messages, timestamp, status } =
     useSelector((state: RootState) => state.message);
 
-  //
-  // console.log("map: ", !messages);
-  // console.log("map: ", messages);
-  // message.map();
-
-  // console.log("sentMessages: ", sentMessages);
-  // console.log("allmessages: ", allMessages);
-
-  // console.log(messages);
-  // console.log(chat_id, sender_id, reciever_id, messages, timestamp, status);
-  function sendMessage(e: React.KeyboardEvent<HTMLInputElement>) {
-    // if (e.key == "Enter") {
-    //   setSentMessages([...sentMessages, message]);
-    //   // console.log("sent", sentMessages);
-    //   socket.emit("send_message", {
-    //     message,
-    //   });
-    //   setAllMessages([
-    //     ...allMessages,
-    //     {
-    //       message: message,
-    //       sender: logged,
-    //       reciever: reciever,
-    //     },
-    //   ]);
-    //   setMessage("");
-    // }
-  }
-
-  // send the message to the database
+  // console.log("messages: ", messages);
+  useEffect(() => {
+    console.log("useEffect:", socket.id);
+    socket.on("receive_message", (data: any) => {
+      console.log("data: ", data);
+    });
+    return () => {
+      // socket.off("receive_message");
+    };
+  }, [socket.id]);
 
   async function saveMessage(e: React.KeyboardEvent<HTMLInputElement>) {
-    socket.on("receive_message", (data: any) => {
-      console.log(data);
-      console.log(socket.id);
-    });
+    const { value: messageInput } = e.target as HTMLInputElement;
 
-    socket.emit("send_message", { message: "Good morning", id: socket.id });
+    // if (messages != null) {
+    // console.log("here first");
+    const newMessage = {
+      sender: logged,
+      message: messageInput,
+      receiver: receiver,
+    };
+
+    dispatch(setMessageOnly(newMessage));
+    // }
+
+    // messages?.push(newMessage);
+
+    // messages?.push(newMessage);
+    // console.log("from this: ", messageInput);
+    // dispatch(setMessage({}));
+
+    socket.emit("send_message", { message: messageInput, id: socket.id });
 
     if (e.key == "Enter") {
       try {
@@ -102,7 +99,7 @@ function Messages({ socket }: MessageProps) {
             {
               "message": message,
               "sender": logged,
-              "reciever": receiver,
+              "receiver": receiver,
             },
           ],
           "logged": logged,
@@ -114,32 +111,12 @@ function Messages({ socket }: MessageProps) {
           },
           body: JSON.stringify(body),
         });
-        // console.log(result);
-        // console.log("enters", e.key);
-        // console.log("sentx");
         setMessage("");
       } catch (error: any) {
         console.log("error", error.message);
       }
     }
   }
-
-  // useEffect(() => {
-  //   socket.on("recieve_message", (data: any) => {
-  //     // recievedMessages.push(data.message)
-  //     // setRecievedMessages([...recievedMessages, data.message])
-  //     setAllMessages([
-  //       ...allMessages,
-  //       {
-  //         message: data.message,
-  //         sender: "",
-  //       },
-  //     ]);
-
-  //     // console.log(data.message)
-  //     setRecieveMessage(data.message);
-  //   });
-  // }, [socket, allMessages]);
 
   return (
     <>
@@ -209,7 +186,6 @@ function Messages({ socket }: MessageProps) {
                   if (e.key == "Enter") {
                     saveMessage(e);
                   }
-                  sendMessage(e);
                 }}
                 value={message}
                 type="text"

@@ -6,19 +6,20 @@ import * as io from "socket.io-client";
 type Message = {
   sender: string, 
   message: string, 
-  reciever: string
+  receiver: string
 }
 
 type InitialState = {
     chat_id?: number, 
     sender_id?: number, 
-    reciever_id?: number, 
-    messages?: Message[], 
+    receiver_id?: number, 
+    messages: Message[], 
     timestamp?: string, 
     status: "sent"
 };
 
 const initialState: InitialState = {
+  messages:  [],
     status: "sent"
 };
 
@@ -38,7 +39,7 @@ export const message = createSlice({
         // ...state,
         chat_id: item.chat_id,
         sender_id: item.sender_id,
-        reciever_id: item.reciever_id,
+        receiver_id: item.receiver_id,
         messages: item.messages,
         timestamp: item.timestamp,
         status: item.status
@@ -48,6 +49,21 @@ export const message = createSlice({
       // console.log("item from reducer: ", item)
       // state.chat = item;
     },
+    setMessageOnly: (state: InitialState, action: PayloadAction<Message>) => {
+      let item = action.payload;
+
+      // console.log("item: ", item)
+      return {
+        ...state,
+        messages: [...(state.messages || []), {
+
+          sender: item.sender,
+          message: item.message,
+          receiver: item.receiver
+        }]
+        
+      }
+    }
 
 }});
 
@@ -107,10 +123,12 @@ export const loggedAndReceiver = createSlice({
 
 export const {
   setMessage,
+  setMessageOnly
+
 
 } = message.actions ;
 
 export const { 
   setLoggedUser,
-  setReceiver
+  setReceiver, 
 } = loggedAndReceiver.actions

@@ -96,39 +96,41 @@ app.post("/login", async (req, res) => {
 
 app.post("/create", async (req, res) => {
     try {
+        console.log(req.body);
         //does chat exist?
 
         // console.log(req.body);
-        const values = [req.body.sender, req.body.reciever];
+
+        const values = [req.body.sender, req.body.receiver];
 
         const sender_id = await pool.query(
             "SELECT user_id FROM super_user WHERE user_name = $1",
             [req.body.sender]
         );
-        const reciever_id = await pool.query(
+        const receiver_id = await pool.query(
             "SELECT user_id FROM super_user WHERE user_name = $1",
-            [req.body.reciever]
+            [req.body.receiver]
         );
 
         const chatExist = await pool.query(
-            "SELECT * FROM chats WHERE (sender_id = $1 OR sender_id = $2) AND (reciever_id = $2 OR reciever_id = $1)",
-            [sender_id.rows[0].user_id, reciever_id.rows[0].user_id]
+            "SELECT * FROM chats WHERE (sender_id = $1 OR sender_id = $2) AND (receiver_id = $2 OR receiver_id = $1)",
+            [sender_id.rows[0].user_id, receiver_id.rows[0].user_id]
         );
 
         if (chatExist.rows.length > 0) {
-            // console.log("Chat exist");
+            console.log("Chat exist");
             return res.send("Chat Already Exist");
         }
 
         const createChat = await pool.query(
-            "INSERT INTO chats (sender_id, reciever_id) VALUES ($1, $2) RETURNING *",
-            [sender_id.rows[0].user_id, reciever_id.rows[0].user_id]
+            "INSERT INTO chats (sender_id, receiver_id) VALUES ($1, $2) RETURNING *",
+            [sender_id.rows[0].user_id, receiver_id.rows[0].user_id]
         );
         // console.log("here", createChat.rows);
 
         res.json(createChat);
     } catch (error) {
-        console.log(error.message);
+        console.log("this error", error.message);
     }
 });
 
@@ -153,17 +155,17 @@ app.get("/loadChat", async (req, res) => {
             "SELECT user_id FROM super_user WHERE user_name = $1",
             [req.query.logged]
         );
-        const reciever_id = await pool.query(
+        const receiver_id = await pool.query(
             "SELECT user_id FROM super_user WHERE user_name = $1",
-            [req.query.reciever]
+            [req.query.receiver]
         );
 
         // console.log("sender-id: ", sender_id.rows[0].user_id);
-        // console.log("reciever_id: ", reciever_id.rows[0].user_id);
+        // console.log("receiver_id: ", receiver_id.rows[0].user_id);
 
         chat = await pool.query(
-            "SELECT * FROM chats WHERE (sender_id = $1 OR sender_id = $2) AND (reciever_id = $1 OR reciever_id = $2)",
-            [sender_id.rows[0].user_id, reciever_id.rows[0].user_id]
+            "SELECT * FROM chats WHERE (sender_id = $1 OR sender_id = $2) AND (receiver_id = $1 OR receiver_id = $2)",
+            [sender_id.rows[0].user_id, receiver_id.rows[0].user_id]
         );
 
         res.json(chat.rows[0]);
@@ -196,48 +198,26 @@ app.put("/chat", async (req, res) => {
     try {
         const lastMessage = req.body.messages[req.body.messages.length - 1];
 
-        // console.log("requ", req.body);
-        // console.log("last message", lastMessage);
-
-        // console.log("message: ", req.body.messages);
-
-        // console.log(req.body.messages);
-
-        // console.log("muath hello -> ", lastMessage.reciever);
-        // console.log("here", req.body.messages[req.body.messages.length - 1]);
-
         const sender_id = await pool.query(
             "SELECT user_id FROM super_user WHERE user_name = $1",
             [lastMessage.sender]
         );
 
-        const reciever_id = await pool.query(
+        const receiver_id = await pool.query(
             "SELECT user_id FROM super_user WHERE user_name = $1",
-            [lastMessage.reciever]
+            [lastMessage.receiver]
         );
-        // if (lastMessage.reciever.length > 0) {
-        //   console.log("created reciever id");
-        //   reciever_id = await pool.query(
-        //     "SELECT user_id FROM super_user WHERE user_name = $1",
-        //     [lastMessage.reciever]
-        //   );
-        // } else {
-        //   console.log("none selected");
-        //   return res.send("no reciever selected");
-        // }
-
-        // console.log("recifasddddddddddddddddddddddddddddddever", reciever_id);
 
         let JSONData = JSON.stringify(req.body.messages);
         // console.log(JSONData);
 
         // console.log("sender-id: ", sender_id.rows[0].user_id);
-        // console.log("reciever_id: ", reciever_id.rows[0].user_id);
+        // console.log("receiver_id: ", receiver_id.rows[0].user_id);
 
         const query = await pool.query(
-            // "UPDATE chats SET messages = messages || $1 WHERE sender_id = $2 AND reciever_id = $3",
-            "UPDATE chats SET messages = COALESCE(messages || $1, $1) WHERE (sender_id = $2 OR sender_id = $3) AND (reciever_id = $2 OR reciever_id = $3)",
-            [JSONData, sender_id.rows[0].user_id, reciever_id.rows[0].user_id]
+            // "UPDATE chats SET messages = messages || $1 WHERE sender_id = $2 AND receiver_id = $3",
+            "UPDATE chats SET messages = COALESCE(messages || $1, $1) WHERE (sender_id = $2 OR sender_id = $3) AND (receiver_id = $2 OR receiver_id = $3)",
+            [JSONData, sender_id.rows[0].user_id, receiver_id.rows[0].user_id]
         );
         res.sendStatus(201);
     } catch (error) {
@@ -255,6 +235,10 @@ io.on("connection", (socket) => {
     //     socket.join(currentRoom);
     //     // console.log("here")
     //   });
+    console.log("user connect");
+    socket.on("disconnect", () => {
+        console.log("user disconnected");
+    });
     let eventEmitted = false;
 
     socket.on("send_message", (data) => {
@@ -262,8 +246,9 @@ io.on("connection", (socket) => {
         // console.log(socket.id);
         // console.log(data);
         if (!eventEmitted) {
-            console.log("data: ", data.id);
+            console.log("data: ", socket.id);
             socket.emit("receive_message", data);
+            // socket.broadcast.emit(data);
             eventEmitted = false;
         }
     });

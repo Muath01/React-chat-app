@@ -1,5 +1,5 @@
 import { Socket } from "dgram";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AiOutlineMessage } from "react-icons/ai";
 import { BsCheckLg } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
@@ -57,7 +57,7 @@ function Messages({ socket }: MessageProps) {
   useEffect(() => {
     console.log("useEffect:", socket.id);
     socket.on("receive_message", (data: any) => {
-      console.log("data: ", data);
+      // console.log("data: ", data);
     });
     return () => {
       // socket.off("receive_message");
@@ -118,19 +118,43 @@ function Messages({ socket }: MessageProps) {
     }
   }
 
+  // scroll into view
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  function scrollToBottom() {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
+  useEffect(() => {
+    console.log("herexxxx");
+    scrollToBottom();
+  }, [messages]);
+
   return (
     <>
-      <div className="h-full  bg-red-10 w-full relative ">
-        <div className="container border-2 shadow-md flex items-center w-full h-20">
+      <div className="h-full  bg-red-10 w-full relative  flex flex-col">
+        <div className="shadow-md flex items-center w-full h-20 ">
           <label className="wotfard">Messages</label>
         </div>
         {receiver ? (
-          <div className="w-full  absolute bottom-0 border-5 border-red-300">
+          <div
+            className="relative h-full"
+            style={{
+              maxHeight: "86vh",
+            }}
+          >
+            {/* <div className="w-full absolute bottom-0 border-2 border-black bg-green-400"> */}
             <div
-              // style={{ width: "100%", height: "100px" }}
-              className="w-full overflow-auto bottom-[4rem] flex"
+              ref={messagesEndRef}
+              className="scroll-bar w-full flex flex-col bottom-0 h-full overflow-auto "
+              style={{
+                maxHeight: "100vh",
+              }}
             >
-              <div className="flex flex-col flex-auto flex-shrink-0 bg-gray-100 h-full p-4 w-3/4 overflow-auto">
+              <div className="flex flex-col flex-auto bg-gray-100 p-3 overflow-auto">
                 <div className="flex flex-col h-full overflow-x-auto mb-4">
                   <div className="flex flex-col h-full">
                     <div className="grid grid-cols-12 gap-y-2">
@@ -147,7 +171,7 @@ function Messages({ socket }: MessageProps) {
                                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
                                   S
                                 </div>
-                                <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+                                <div className="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl caret-transparent">
                                   <div>{item.message}</div>
                                 </div>
                               </div>
@@ -161,38 +185,45 @@ function Messages({ socket }: MessageProps) {
                                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
                                   R
                                 </div>
-                                <div className="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
+                                <div className="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl caret-transparent">
                                   <div>{item.message}</div>
                                 </div>
                               </div>
                             </div>
                           )
                         )}
+                      <div
+                        className="caret-transparent"
+                        ref={messagesEndRef}
+                      ></div>
+
                       {/* end of map */}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="relative mt-1 rounded-md shadow-sm">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <span className="text-gray-500 sm:text-sm">
-                  <AiOutlineMessage size={15} />
-                </span>
+              <div className="relative mt-1 shadow-sm ">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 border-3">
+                  <span className="text-gray-500 sm:text-sm">
+                    <AiOutlineMessage size={15} />
+                  </span>
+                </div>
+                <input
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key == "Enter") {
+                      saveMessage(e);
+                    }
+                  }}
+                  value={message}
+                  type="text"
+                  className="block w-full rounded-md pl-7 pr-12  sm:text-sm h-10 bg-gray-100 p-2 focus:outline-none"
+                  placeholder="Say hi..."
+                />
               </div>
-              <input
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key == "Enter") {
-                    saveMessage(e);
-                  }
-                }}
-                value={message}
-                type="text"
-                className="block w-full rounded-md border-gray-500 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10 bg-gray-100"
-                placeholder="Say hi..."
-              />
             </div>
+
+            {/* </div> */}
           </div>
         ) : null}
       </div>

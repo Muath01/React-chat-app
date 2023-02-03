@@ -135,7 +135,7 @@ function RightBar({ socket }: RightBarProps) {
                 fetchMessage(e);
               }}
               key={index}
-              className="hover:bg-gray-100 hover:text-blue-600 rounded-lg w-100% flex items-center gap-1 cursor-pointer"
+              className="hover:bg-gray-100 hover:text-blue-600 rounded-lg w-100% flex items-center gap-1 cursor-pointer caret-transparent"
             >
               {" "}
               {item.user_name}

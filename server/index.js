@@ -236,21 +236,19 @@ io.on("connection", (socket) => {
     //     // console.log("here")
     //   });
     console.log("user connect");
-    socket.on("disconnect", () => {
-        console.log("user disconnected");
-    });
+
     let eventEmitted = false;
 
     socket.on("send_message", (data) => {
         data.id = socket.id;
         // console.log(socket.id);
         // console.log(data);
-        if (!eventEmitted) {
-            console.log("data: ", socket.id);
-            socket.emit("receive_message", data);
-            // socket.broadcast.emit(data);
-            eventEmitted = false;
-        }
+        // if (!eventEmitted) {
+        console.log("data: ", socket.id);
+        socket.emit("receive_message", data);
+        // socket.broadcast.emit(data);
+        // eventEmitted = false;
+        // }
     });
 });
 

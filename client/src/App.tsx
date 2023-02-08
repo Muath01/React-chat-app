@@ -46,24 +46,26 @@ function App() {
   const { chat } = useSelector((state: any) => state.message);
 
   return (
-    <div className="h-full">
-      {!loginSucceful ? (
-        <Login setLoginSucceful={setLoginSucceful} />
-      ) : (
-        <div className="grid grid-cols-12  h-full">
-          <div className="col-span-3">
-            <SideBar />
-          </div>
+    <div className="border-2 border-black w-2/4 h-3/4 absolute left-[20%] top-[10%] flex justify-center items-center">
+      <div className="w-full h-full">
+        {!loginSucceful ? (
+          <Login setLoginSucceful={setLoginSucceful} />
+        ) : (
+          <div className="grid grid-cols-12 h-full">
+            <div className="col-span-3">
+              <SideBar />
+            </div>
 
-          <div className="col-span-6 w-full">
-            <Messages socket={socket} />
-          </div>
+            <div className="col-span-6 w-full overflow-hidden">
+              <Messages socket={socket} />
+            </div>
 
-          <div className="col-span-3">
-            <RightBar socket={socket} />
+            <div className="col-span-3">
+              <RightBar socket={socket} />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

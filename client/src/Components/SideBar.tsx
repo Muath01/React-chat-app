@@ -11,7 +11,7 @@ function SideBar() {
   const { logged } = useSelector((state: RootState) => state.loggedAndReceiver);
   const sideBarItems = [
     {
-      text: "Friends",
+      text: "Add Friends",
       icon: <FaUserFriends size={20} />,
     },
 
@@ -32,16 +32,18 @@ function SideBar() {
   ];
 
   return (
-    <div className="list-none shadow-lg text-4xl w-full h-full my-1 muath">
-      <h2 className="wotfard relative top-3 left-5 caret-transparent">
-        {logged}
-      </h2>
+    <div className="list-none shadow-lg text-4xl w-full h-full muath bg-white ">
+      <div className="">
+        <h2 className="wotfard  relative top-3 left-5 caret-transparent text-orange-400">
+          {logged}
+        </h2>
+      </div>
 
       <ul className="text-xl my-10 flex flex-col caret-transparent">
         {sideBarItems.map((item, index) => (
           <li
             key={index}
-            className="hover:bg-gray-100 hover:text-blue-600 rounded-lg w-100% flex items-center gap-1 cursor-pointer caret-transparent"
+            className="hover:bg-gray-100 hover:text-blue-600 rounded-lg w-100% flex items-center gap-1 cursor-pointer caret-transparent shadow"
           >
             {" "}
             {item.icon} {item.text}

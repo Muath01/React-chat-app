@@ -135,8 +135,8 @@ function Messages({ socket }: MessageProps) {
 
   return (
     <>
-      <div className="h-full  bg-red-10 w-full relative  flex flex-col">
-        <div className="shadow-md flex items-center w-full h-20 ">
+      <div className="h-full  bg-red-10 w-full relative flex flex-col">
+        <div className="shadow-md flex items-center w-full h-20 absolute z-10 bg-white">
           <label className="wotfard">Messages</label>
         </div>
         {receiver ? (
@@ -148,13 +148,13 @@ function Messages({ socket }: MessageProps) {
           >
             {/* <div className="w-full absolute bottom-0 border-2 border-black bg-green-400"> */}
             <div
-              className="scroll-bar w-full flex flex-col bottom-0 h-full overflow-auto "
+              className="scroll-bar w-full flex flex-col bottom-0 h-full"
               style={{
                 maxHeight: "100vh",
               }}
             >
-              <div className="flex flex-col flex-auto bg-gray-100 p-3 overflow-auto">
-                <div className="flex flex-col h-full overflow-x-auto mb-4">
+              <div className="flex flex-col flex-auto bg-gray-100 p-3 overflow-auto  ">
+                <div className="flex flex-col h-full overflow-x-auto mb-4 overflow-auto">
                   <div className="flex flex-col h-full">
                     <div className="grid grid-cols-12 gap-y-2">
                       {/* Map function */}
@@ -164,9 +164,9 @@ function Messages({ socket }: MessageProps) {
                           item.sender == logged ? (
                             <div
                               key={`message${index}`}
-                              className="col-start-1 col-end-8 p-3 rounded-lg"
+                              className="col-start-1 col-end-8 p-3 rounded-lg "
                             >
-                              <div className="flex flex-row items-center">
+                              <div className="flex flex-row items-center ">
                                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0 caret-transparent">
                                   S
                                 </div>
@@ -180,11 +180,11 @@ function Messages({ socket }: MessageProps) {
                               key={`message${index}`}
                               className="col-start-6 col-end-13 p-3 rounded-lg"
                             >
-                              <div className="flex items-center justify-start flex-row-reverse">
+                              <div className="flex items-center justify-start flex-row-reverse ">
                                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0 caret-transparent">
                                   R
                                 </div>
-                                <div className="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl caret-transparent">
+                                <div className="relative mr-3 text-sm bg-slate-500 py-2 px-4 shadow rounded-xl caret-transparent">
                                   <div>{item.message}</div>
                                 </div>
                               </div>
@@ -201,8 +201,8 @@ function Messages({ socket }: MessageProps) {
                   </div>
                 </div>
               </div>
-              <div className="relative mt-1 shadow-sm ">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 border-3">
+              <div className="relative border border-white shadow-sm ">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 border-3 ">
                   <span className="text-gray-500 sm:text-sm">
                     <AiOutlineMessage size={15} />
                   </span>

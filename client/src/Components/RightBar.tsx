@@ -118,11 +118,11 @@ function RightBar({ socket }: RightBarProps) {
   ];
 
   return (
-    <div className="list-none shadow-lg text-4xl h-full my-1 muath w-full">
-      <h2 className="wotfard relative top-3 left-1">Users</h2>
+    <div className="list-none shadow-lg text-4xl h-full  muath w-full bg-white">
+      <h2 className="wotfard relative top-3 left-1 text-orange-300">Users</h2>
       {/* <Messages socket={socket} /> */}
 
-      <ul className="text-xl my-10 flex flex-col ">
+      <ul className="text-xl my-10 flex flex-col">
         {users != undefined &&
           users.length > 0 &&
           users.map((item, index) => (
@@ -135,7 +135,7 @@ function RightBar({ socket }: RightBarProps) {
                 fetchMessage(e);
               }}
               key={index}
-              className="hover:bg-gray-100 hover:text-blue-600 rounded-lg w-100% flex items-center gap-1 cursor-pointer caret-transparent"
+              className="hover:bg-gray-100 hover:text-blue-600 rounded-lg w-100% flex items-center gap-1 cursor-pointer caret-transparent shadow "
             >
               {" "}
               {item.user_name}

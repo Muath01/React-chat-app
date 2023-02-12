@@ -7,6 +7,7 @@ import { TbSocial } from "react-icons/tb";
 import { setMessage, setReceiver } from "../Redux/message";
 import Messages from "./Messages";
 import { RootState } from "../Redux/store";
+import { updateUser } from "../Redux/users";
 
 type User = [
   {
@@ -31,6 +32,13 @@ function RightBar({ socket }: RightBarProps) {
     (state: RootState) => state.loggedAndReceiver
   );
 
+  const usersState = useSelector((state: RootState) => state.users);
+
+  // const first_name = usersState.length > 0 ? usersState[0].first_name : "";
+  // const second_name = usersState.length > 0 ? usersState[0].second_name : "";
+  // const user_name = usersState.length > 0 ? usersState[0].user_name : "";
+  // const user_id = usersState.length > 0 ? usersState[0].user_id : "";
+
   // useEffect(() => {}, [receiver]);
 
   const dispatch = useDispatch();
@@ -44,6 +52,7 @@ function RightBar({ socket }: RightBarProps) {
       const jsonResponse = await response.json();
 
       setUsers(jsonResponse);
+      dispatch(updateUser(jsonResponse));
     } catch (error: any) {
       console.log(error.message);
     }
@@ -58,7 +67,7 @@ function RightBar({ socket }: RightBarProps) {
     await dispatch(setReceiver(target.innerText));
 
     try {
-      console.log("here", target.innerText);
+      // console.log("here", target.innerText);
       const url =
         "http://localhost:3001/loadChat?logged=" +
         logged +

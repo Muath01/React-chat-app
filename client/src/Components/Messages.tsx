@@ -55,7 +55,7 @@ function Messages({ socket }: MessageProps) {
 
   // console.log("messages: ", messages);
   useEffect(() => {
-    console.log("useEffect:", socket.id);
+    // console.log("useEffect:", socket.id);
     socket.on("receive_message", (data: any) => {
       // console.log("data: ", data);
     });
@@ -129,7 +129,6 @@ function Messages({ socket }: MessageProps) {
   }
 
   useEffect(() => {
-    console.log("herexxxx");
     scrollToBottom();
   }, [messages]);
 
@@ -216,7 +215,7 @@ function Messages({ socket }: MessageProps) {
                   }}
                   value={message}
                   type="text"
-                  className="block w-full rounded-md pl-7 pr-12  sm:text-sm h-10 bg-gray-100 p-2 focus:outline-none"
+                  className="block w-full pl-7 pr-12  sm:text-sm h-10 bg-gray-100 p-2 focus:outline-none"
                   placeholder="Say hi..."
                 />
               </div>

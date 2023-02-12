@@ -49,7 +49,7 @@ function Login({
       ) : (
         <div className="flex justify-center border-2 w-full h-full items-center ">
           {/* <div className=""> */}
-          <div className="space-y-4 md:space-y-6 sm:p-8 border-2 w-2/4 h-3/4 flex flex-col justify-center">
+          <div className="space-y-4 md:space-y-6 sm:p-8 border-2 w-2/4 h-3/4 flex flex-col justify-center bg-white">
             <h1 className="top-0 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your account
             </h1>

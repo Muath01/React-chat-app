@@ -46,12 +46,12 @@ function App() {
   const { chat } = useSelector((state: any) => state.message);
 
   return (
-    <div className="border-2 border-black w-2/4 h-3/4 absolute left-[20%] top-[10%] flex justify-center items-center">
-      <div className="w-full h-full">
+    <div className="border-4 border-red-300 shadow-md rounded-md w-2/4 h-3/4 absolute left-[20%] top-[10%] flex justify-center items-center">
+      <div className="w-full h-full ">
         {!loginSucceful ? (
           <Login setLoginSucceful={setLoginSucceful} />
         ) : (
-          <div className="grid grid-cols-12 h-full">
+          <div className="grid grid-cols-12 h-full ">
             <div className="col-span-3">
               <SideBar />
             </div>

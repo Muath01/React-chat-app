@@ -35,8 +35,29 @@ function SideBar() {
   const usersState = useSelector((state: RootState) => state.users);
 
   function openModal() {
-    console.log(usersState);
+    console.log("this", usersState);
     setModal(true);
+  }
+
+  async function addFriend(
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    name: string
+  ) {
+    const { innerText } = e.target as HTMLElement;
+
+    try {
+      console.log("HEllo");
+      const body = { name, logged };
+      const result = await fetch("http://localhost:3001/addFriend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        body: JSON.stringify(body),
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (
@@ -104,17 +125,20 @@ function SideBar() {
 
                 {/* friends */}
 
-                {usersState.map((user) => (
-                  <div className="px-4 py-3 sm:flex sm:px-6 mb-2 border-1 shadow-md bg-red-100">
-                    <h2>{user.user_name}</h2>
-                    <button
-                      type="button"
-                      className="absolute right-10 inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm"
-                    >
-                      Add Friend
-                    </button>
-                  </div>
-                ))}
+                <div className="h-2/3 overflow-auto ">
+                  {usersState.map((user) => (
+                    <div className="px-4 py-3 sm:flex sm:px-6 mb-2 shadow-sm  relative">
+                      <h2>{user.user_name}</h2>
+                      <button
+                        onClick={(e) => addFriend(e, user.user_name!)}
+                        type="button"
+                        className="absolute right-10 inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm"
+                      >
+                        Add Friend
+                      </button>
+                    </div>
+                  ))}
+                </div>
 
                 {/* Cancel */}
                 <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 absolute bottom-0 right-0">

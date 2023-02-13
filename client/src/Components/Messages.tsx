@@ -30,30 +30,21 @@ type Message = {
 };
 
 function Messages({ socket }: MessageProps) {
-  const [recieveMessage, setRecieveMessage] = useState("");
-
-  // an array to display for sent and recieved messages
-
-  const [com, setCom] = useState<chat_id>();
-
+  //dispatch()
   const dispatch = useDispatch();
 
-  const [sentMessages, setSentMessages] = useState<string[]>([]);
-  const [recievedMessages, setRecievedMessages] = useState<string[]>([]);
+  // states
   const [allMessages, setAllMessages] = useState<Message[]>([]);
+  const [message, setMessage] = useState("");
 
-  // const logged = localStorage.getItem("logged"); // The person that is logged in/also the sender
-  // const reciever = localStorage.getItem("reciever"); // The person the is going to reciev the message(whenever you click on a diff user on the RightBar, this gets updated.)
-
+  //Selectors
   const { logged, receiver } = useSelector(
     (state: RootState) => state.loggedAndReceiver
   );
-  const [message, setMessage] = useState("");
-  // selector
   const { chat_id, sender_id, receiver_id, messages, timestamp, status } =
     useSelector((state: RootState) => state.message);
 
-  // console.log("messages: ", messages);
+  // useEffect
   useEffect(() => {
     // console.log("useEffect:", socket.id);
     socket.on("receive_message", (data: any) => {
@@ -76,13 +67,6 @@ function Messages({ socket }: MessageProps) {
     };
 
     dispatch(setMessageOnly(newMessage));
-    // }
-
-    // messages?.push(newMessage);
-
-    // messages?.push(newMessage);
-    // console.log("from this: ", messageInput);
-    // dispatch(setMessage({}));
 
     socket.emit("send_message", { message: messageInput, id: socket.id });
 
@@ -94,6 +78,7 @@ function Messages({ socket }: MessageProps) {
             sender: logged,
           },
         ]);
+
         const body = {
           "messages": [
             {
@@ -129,18 +114,19 @@ function Messages({ socket }: MessageProps) {
   }
 
   useEffect(() => {
+    console.log("coco", messages);
     scrollToBottom();
   }, [messages]);
 
   return (
     <>
-      <div className="h-full  bg-red-10 w-full relative flex flex-col">
-        <div className="shadow-md flex items-center w-full h-20 absolute z-10 bg-white">
+      <div className="h-full  bg-red-10 w-full relative flex flex-col  ">
+        <div className="shadow-md flex items-center w-full h-20  z-10 bg-white ">
           <label className="wotfard">Messages</label>
         </div>
         {receiver ? (
           <div
-            className="relative h-full"
+            className="h-full"
             style={{
               maxHeight: "86vh",
             }}
@@ -152,7 +138,7 @@ function Messages({ socket }: MessageProps) {
                 maxHeight: "100vh",
               }}
             >
-              <div className="flex flex-col flex-auto bg-gray-100 p-3 overflow-auto  ">
+              <div className="flex flex-col flex-auto bg-gray-100 p-3 overflow-auto h-full">
                 <div className="flex flex-col h-full overflow-x-auto mb-4 overflow-auto">
                   <div className="flex flex-col h-full">
                     <div className="grid grid-cols-12 gap-y-2">
@@ -163,7 +149,7 @@ function Messages({ socket }: MessageProps) {
                           item.sender == logged ? (
                             <div
                               key={`message${index}`}
-                              className="col-start-1 col-end-8 p-3 rounded-lg "
+                              className="col-start-1 col-end-8 p-3 rounded-lg"
                             >
                               <div className="flex flex-row items-center ">
                                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0 caret-transparent">

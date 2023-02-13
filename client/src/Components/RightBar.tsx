@@ -45,14 +45,32 @@ function RightBar({ socket }: RightBarProps) {
 
   // load users on the right side of the screen
 
+  async function getFriends() {
+    try {
+      const url = "http://localhost:3001/friends?logged=" + logged;
+      const response = await fetch(url);
+      const jsonResponse = await response.json();
+
+      setUsers(jsonResponse);
+      // dispatch(updateUser(jsonResponse));
+
+      console.log("RESPONSE: ", jsonResponse);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
+
   async function getUsers() {
     try {
       const url = "http://localhost:3001/users?logged=" + logged;
       const response = await fetch(url);
       const jsonResponse = await response.json();
 
-      setUsers(jsonResponse);
+      // setUsers(jsonResponse);
+      console.log("RE: ", jsonResponse);
       dispatch(updateUser(jsonResponse));
+
+      console.log("RESPONSE: ", jsonResponse);
     } catch (error: any) {
       console.log(error.message);
     }
@@ -108,15 +126,22 @@ function RightBar({ socket }: RightBarProps) {
     e.preventDefault();
 
     try {
-      const url = `http://localhost:3001/chats?user_name=` + receiver;
+      const body = { receiver, logged };
+      const url =
+        `http://localhost:3001/chats?user_name=` +
+        receiver +
+        "&logged=" +
+        logged;
       const response = await fetch(url);
       const jsonResponse = await response.json();
+      console.log("THISISISISI", jsonResponse);
     } catch (error: any) {
       console.log(error.message);
     }
   }
 
   useEffect(() => {
+    getFriends();
     getUsers();
   }, []);
   const sideBarItems = [
@@ -138,16 +163,26 @@ function RightBar({ socket }: RightBarProps) {
             <li
               onClick={(e) => {
                 const target = e.target as HTMLElement;
+                console.log("here");
 
                 getMessage(e);
                 createChat(e);
                 fetchMessage(e);
               }}
               key={index}
-              className="hover:bg-gray-100 hover:text-blue-600 rounded-lg w-100% flex items-center gap-1 cursor-pointer caret-transparent shadow "
+              className="hover:bg-gray-100 hover:text-blue-600 rounded-lg w-100% flex items-center gap-1 cursor-pointer caret-transparent shadow  "
             >
               {" "}
               {item.user_name}
+              <button
+                onClick={(e) => {
+                  console.log("here");
+                  e.stopPropagation();
+                }}
+                className="bg-red-600 rounded-full py-1 px-3 absolute right-4 text-black hover:bg-red-700 "
+              >
+                X
+              </button>
             </li>
           ))}
       </ul>

@@ -89,6 +89,7 @@ app.post("/login", async (req, res) => {
         }
 
         res.json(status);
+        // res.send("hello");
     } catch (err) {
         console.log(err.message);
     }
@@ -134,18 +135,103 @@ app.post("/create", async (req, res) => {
     }
 });
 
-app.get("/users", async (req, res) => {
+// Add a friend
+
+app.post("/addFriend", async (req, res) => {
     try {
-        console.log("body", req.query.logged);
+        const requester = await pool.query(
+            "SELECT user_id FROM super_user WHERE user_name = $1",
+            [req.body.logged]
+        );
+        const requested = await pool.query(
+            "SELECT user_id FROM super_user WHERE user_name = $1",
+            [req.body.name]
+        );
+
+        const addFriend = await pool.query(
+            "INSERT INTO super_user_friends (user_id, friend_id) VALUES ($1, $2), ($2, $1) ON CONFLICT (user_id, friend_id) DO NOTHING",
+            [requester.rows[0].user_id, requested.rows[0].user_id]
+        );
+        res.json(addFriend);
+    } catch (error) {}
+});
+
+// Get Requests
+
+app.get("/friends", async (req, res) => {
+    try {
+        const logged_id = await pool.query(
+            "SELECT user_id FROM super_user WHERE user_name = $1 ",
+            [req.query.logged]
+        );
         users = await pool.query(
-            "SELECT * FROM super_user WHERE user_name != $1",
+            "SELECT * FROM super_user_friends WHERE user_id = $1",
+            [logged_id.rows[0].user_id]
+        );
+
+        let friends = [];
+
+        await Promise.all(
+            users.rows.map(async (user) => {
+                const { rows } = await pool.query(
+                    "SELECT * FROM super_user WHERE user_id = $1",
+                    [user.friend_id]
+                );
+                friends.push(rows);
+            })
+        );
+
+        res.json(friends.flat());
+        // console.log("body", req.body);
+    } catch (err) {
+        console.log("this here", err.message);
+    }
+});
+
+app.get("/users", async (req, res) => {
+    console.log("bodys", req.query.logged);
+    try {
+        const user_id = await pool.query(
+            "SELECT user_id FROM super_user WHERE user_name = $1",
             [req.query.logged]
         );
 
-        res.json(users.rows);
-        // console.log("body", req.body);
+        console.log("here: ", user_id.rows[0]);
+
+        const friends = await pool.query(
+            "SELECT friend_id FROM super_user_friends WHERE user_id NOT IN (SELECT friend_id FROM super_user_friends WHERE user_id = $1) ",
+            [user_id.rows[0].user_id]
+        );
+
+        // console.log("friendsXX", friends.rows);
+        // const users = await pool.query(
+        //     "SELECT * FROM super_user WHERE user_name != $1",
+        //     [req.query.logged]
+        // );
+
+        const friendIds = friends.rows.map((friend) => friend.friend_id);
+
+        // console.log("list", friendIds); //list [ 50, 51 ]
+
+        let users = [];
+        let filteredUsers;
+        await Promise.all(
+            friendIds.map(async (user) => {
+                // console.log(user);
+                const { rows } = await pool.query(
+                    "SELECT * FROM super_user WHERE user_id != $1",
+                    [user]
+                );
+                filteredUsers = rows.filter(
+                    (user) => !friendIds.includes(user.user_id)
+                );
+                users.push(rows);
+            })
+        );
+
+        res.json(filteredUsers);
     } catch (err) {
-        console.log(err.message);
+        console.log("this here", err.message);
     }
 });
 
@@ -160,9 +246,6 @@ app.get("/loadChat", async (req, res) => {
             [req.query.receiver]
         );
 
-        // console.log("sender-id: ", sender_id.rows[0].user_id);
-        // console.log("receiver_id: ", receiver_id.rows[0].user_id);
-
         chat = await pool.query(
             "SELECT * FROM chats WHERE (sender_id = $1 OR sender_id = $2) AND (receiver_id = $1 OR receiver_id = $2)",
             [sender_id.rows[0].user_id, receiver_id.rows[0].user_id]
@@ -176,14 +259,25 @@ app.get("/loadChat", async (req, res) => {
 
 app.get("/chats", async (req, res) => {
     try {
-        sender_id = await pool.query(
+        receiver_id = await pool.query(
             "SELECT user_id FROM super_user WHERE user_name = $1",
             [req.query.user_name]
         );
 
-        chat = pool.query("Select * FROM chats WHERE sender_id = $1", [
-            sender_id.rows[0].user_id,
-        ]);
+        sender_id = await pool.query(
+            "SELECT user_id FROM super_user WHERE user_name = $1",
+            [req.query.logged]
+        );
+
+        console.log("rec: ", receiver_id.rows[0], "log: ", sender_id.rows[0]);
+
+        chat = await pool.query(
+            "Select * FROM chats WHERE sender_id = $1 and receiver_id = $2",
+            [sender_id.rows[0].user_id, receiver_id.rows[0].user_id]
+        );
+
+        // console.log("chat: ", chat);
+        console.log("id: ", sender_id.rows[0].user_id);
 
         res.json(chat);
     } catch (error) {
@@ -228,27 +322,9 @@ app.put("/chat", async (req, res) => {
 // Socket io.
 
 io.on("connection", (socket) => {
-    // console.log("User connected: ", socket.id);
-
-    //   socket.on("join_room", (data) => {
-    //     socket.leave(currentRoom);
-    //     socket.join(currentRoom);
-    //     // console.log("here")
-    //   });
-    console.log("user connect");
-
-    let eventEmitted = false;
-
     socket.on("send_message", (data) => {
-        data.id = socket.id;
-        // console.log(socket.id);
-        // console.log(data);
-        // if (!eventEmitted) {
-        console.log("data: ", socket.id);
+        console.log("data: ", socket.id); // this logs
         socket.emit("receive_message", data);
-        // socket.broadcast.emit(data);
-        // eventEmitted = false;
-        // }
     });
 });
 

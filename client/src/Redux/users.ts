@@ -25,7 +25,7 @@ export const users = createSlice({
 
 
             // console.log(state)
-            return [...state, ...item]
+            return [...item]
             // console.log("item", item[0])
         }
     }

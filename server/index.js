@@ -285,7 +285,6 @@ app.get("/chats", async (req, res) => {
     }
 });
 
-
 // Put requests
 
 // gets the individual chats
